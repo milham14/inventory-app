@@ -45,7 +45,7 @@
           />
         </div>
         <div class="info ms-2">
-          <p class="mb-0 text-white">Admin</p>
+          <p class="mb-0 text-white">Admin RPA</p>
         </div>
         <i class="right fas fa-angle-left ms-auto"></i>
       </div>
@@ -227,8 +227,8 @@
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
-                 <li class="nav-item">
-                  <a href="#" class="nav-link">
+                 <li class="nav-item has-treeview" [class.menu-open]="masterDataOpen">
+                  <a href="#" class="nav-link" (click)="toggleDataMaster($event)">
                     <i class="fa fa-folder-open"></i>
                     <p>
                       Data Master
@@ -281,8 +281,8 @@
                   </ul>
                 </li>
 
-            <li class="nav-item">
-              <a href="#" class="nav-link">
+            <li class="nav-item has-treeview" [class.menu-open]="acceptMaterialOpen">
+              <a href="#" class="nav-link" (click)="toggleAcceptMaterial($event)">
                 <i class="fas fa-tools"></i>
                 <p>
                   Material

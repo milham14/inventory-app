@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   standalone: true,
@@ -9,8 +10,18 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 })
 export class AdminComponent implements OnInit {
   userMenuOpen = false;
+  masterDataOpen = false;
+  acceptMaterialOpen = false;
+  authService: any;
 
-  constructor(private router:Router) {}
+  constructor(private router:Router, private auth: AuthService) {}
+
+  ngOnInit(): void {
+        // Cek apakah user sudah login, jika belum, arahkan ke halaman login
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   /** 
    * Toggle menu; 
@@ -22,10 +33,22 @@ export class AdminComponent implements OnInit {
     this.userMenuOpen = !this.userMenuOpen;
   }
 
+  toggleDataMaster(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.masterDataOpen = !this.masterDataOpen;
+  }
+
+  toggleAcceptMaterial(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.acceptMaterialOpen = !this.acceptMaterialOpen;
+  }
+
   /** Hanya logout waktu tombol logout diklik */
   onLogoutClick(event: MouseEvent) {
     event.stopPropagation();
-    localStorage.removeItem('token');
+    /**localStorage.removeItem('token'); */
     this.router.navigate(['/login']);
   }
 
@@ -35,9 +58,11 @@ export class AdminComponent implements OnInit {
     if (!target.closest('.has-treeview')) {
       this.userMenuOpen = false;
     }
-  }
-
-  ngOnInit(): void {
-    
+    if (!target.closest('.has-treeview')) {
+      this.masterDataOpen = false;
+    }
+    if (!target.closest('.has-treeview')) {
+      this.acceptMaterialOpen = false;
+    }
   }
 }
