@@ -9,6 +9,7 @@ import { UserComponent } from './components/data/user/user.component';
 import { RoleComponent } from './components/data/role/role.component';
 import { PermissionComponent } from './components/data/permission/permission.component';
 import { MaterialComponent } from './components/data/material/material.component';
+import { PartComponent } from './components/data/part/part.component';
 
 export const routes: Routes = [
     {
@@ -46,6 +47,10 @@ export const routes: Routes = [
             {
                 path: 'material',
                 component: MaterialComponent
+            },
+            {
+                path: 'part',
+                component: PartComponent
             },
             {
                 path: 'contact',

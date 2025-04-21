@@ -6,7 +6,7 @@
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a style="color: #3399ff;">Data Master</a></li>
-            <li class="breadcrumb-item active" style="color: #202020;">Material</li>
+            <li class="breadcrumb-item active" style="color: #202020;">Part</li>
           </ol>
         </div>
       </div>
@@ -17,7 +17,7 @@
     <div class="card-header">
       <div class="row align-items-center">
         <div class="col-6">
-          <span>List Material</span>
+          <span>List Part</span>
         </div>
         <div class="col-6 text-right">
           <button class="btn btn-success" (click)="openModal()">Tambah User</button>
@@ -30,8 +30,8 @@
         <thead>
           <tr>
             <th>No</th>
-            <th>Nomor Material</th>
-            <th>Nama Material</th>
+            <th>Nomor Part</th>
+            <th>Nama Part</th>
             <th>Quantity</th>
             <th>Aksi</th>
           </tr>
@@ -39,8 +39,8 @@
         <tbody>
           <tr *ngFor="let user of dataSource; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ user.nomor_material }}</td>
-            <td>{{ user.nama_material }}</td>
+            <td>{{ user.nomor_part }}</td>
+            <td>{{ user.nama_part }}</td>
             <td>{{ user.qty }}</td>
             <td>
               <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
@@ -65,12 +65,12 @@
         <div class="modal-body">
           <form>
             <div class="form-group">
-              <label for="nomor_material">Nomor Material</label>
-              <input id="nomor_material" name="nomor_material" type="text" class="form-control" [(ngModel)]="newUser.nomor_material">
+              <label for="nomor_part">Nomor Part</label>
+              <input id="nomor_part" name="nomor_part" type="text" class="form-control" [(ngModel)]="newUser.nomor_part">
             </div>
             <div class="form-group">
-              <label for="nama_material">Nama Material</label>
-              <input id="nama_material" name="nama_material" type="text" class="form-control" [(ngModel)]="newUser.nama_material">
+              <label for="nama_part">Nama Part</label>
+              <input id="nama_part" name="nama_part" type="text" class="form-control" [(ngModel)]="newUser.nama_part">
             </div>
             <div class="form-group">
               <label for="qty">Quantity</label>

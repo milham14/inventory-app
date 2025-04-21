@@ -14,47 +14,69 @@
   </section>
 
   <div class="card">
-    <div class="card-header">List User</div>
-    <div class="card-body">
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 w-100">
-
-        <ng-container matColumnDef="no">
-          <th mat-header-cell *matHeaderCellDef>No</th>
-          <td mat-cell *matCellDef="let row">{{ row.no }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="nama">
-          <th mat-header-cell *matHeaderCellDef>Nama</th>
-          <td mat-cell *matCellDef="let row">{{ row.nama }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="username">
-          <th mat-header-cell *matHeaderCellDef>Username</th>
-          <td mat-cell *matCellDef="let row">{{ row.username }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="role">
-          <th mat-header-cell *matHeaderCellDef>Role</th>
-          <td mat-cell *matCellDef="let row">{{ row.role }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef>Action</th>
-          <td mat-cell *matCellDef="let row">
-            <button class="btn btn-primary btn-sm mr-1" (click)="editUser(row)">Edit</button>
-            <button class="btn btn-danger btn-sm" (click)="deleteUser(row)">Hapus</button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-
-      <div style="display: flex; justify-content: center; margin-top: 16px;">
-        <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]">
-        </mat-paginator>
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-6">
+          <span>List Permission</span>
+        </div>
+        <div class="col-6 text-right">
+          <button class="btn btn-success" (click)="openModal()">Tambah User</button>
+        </div>
       </div>
-      
+    </div>
+
+    <div class="card-body">
+      <table id="userTable" class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Role</th>
+            <th>Permission</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of dataSource; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.permission }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Tambah/Edit User -->
+  <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTambahUserLabel">{{ selectedUser ? 'Edit User' : 'Tambah User' }}</h5>
+          <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="role">Role</label>
+              <input id="role" name="role" type="text" class="form-control" [(ngModel)]="newUser.role">
+            </div>
+            <div class="form-group">
+              <label for="permission">Permission</label>
+              <input id="permission" name="permission" type="text" class="form-control" [(ngModel)]="newUser.permission">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

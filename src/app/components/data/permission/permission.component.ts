@@ -1,69 +1,133 @@
-import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import { isPlatformBrowser } from '@angular/common';
-import { MatPaginator } from '@angular/material/paginator'; // BUKAN MatPaginatorModule
-import { MatPaginatorModule } from '@angular/material/paginator'; // ✅ ini tetap dipakai
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 declare var $: any;
 
 @Component({
   standalone: true,
-  selector: 'app-user',
-  imports: [CommonModule, MatPaginatorModule, MatTableModule, MatFormFieldModule, MatSelectModule],
+  selector: 'app-permission',
   templateUrl: './permission.component.html',
-  host: {ngSkipHydration: 'true'},
+  host: { ngSkipHydration: 'true' },
+  imports: [CommonModule, FormsModule],
 })
-export class PermissionComponent implements OnInit, AfterViewInit  {
+export class PermissionComponent implements OnInit, AfterViewInit {
   isBrowser: boolean = false;
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
-  displayedColumns: string[] = ['no', 'nama', 'username', 'role', 'action'];
-  rows: any[] = [];
+  dataSource: any[] = [];
 
-  dataSource = new MatTableDataSource<any>();
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
- ngOnInit(): void {
-  const singleRow = { 
-    nama: 'John Doe', 
-    username: 'john@example.com', 
-    role: 'Admin' 
+  // New user data for form
+  newUser = {
+    role: '',
+    permission: '',
   };
-  // Gandakan data menjadi 5 baris dengan menambahkan nomor urut
-  this.rows = Array(1).fill(null).map((_, index) => ({
-    no: index + 1,  // Menambahkan nomor urut
-    nama: singleRow.nama,
-    username: singleRow.username,
-    role: singleRow.role
-  }));
-  this.dataSource.data = this.rows;
 
-  if (isPlatformBrowser(this.platformId)) {
-    this.isBrowser = true;
-  }
- }
+  // Selected user for editing
+  selectedUser: any = null;
 
- ngAfterViewInit() {
-  setTimeout(() => {
-    if (this.paginator) {
-      this.dataSource.paginator = this.paginator;
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isBrowser = true;
     }
-  });
-}
 
+    // Initial data
+    this.dataSource = [];
+  }
 
-editUser(row: any) {
-  // Handle Edit button click
-  console.log('Edit user:', row);
-}
+  ngAfterViewInit(): void {
+    if (this.isBrowser) {
+      setTimeout(() => {
+        $('#userTable').DataTable();  // Initialize DataTable
+      }, 0);
+    }
+  }
 
-deleteUser(row: any) {
-  // Handle Hapus button click
-  console.log('Delete user:', row);
-}
+  // Function to save a new user
+  simpanUser() {
+    if (this.selectedUser) {
+      // Edit existing user
+      this.selectedUser.role = this.newUser.role;
+      this.selectedUser.permission = this.newUser.permission;
+    } else {
+      // Add new user
+      this.dataSource.push({
+        role: this.newUser.role,
+        permission: this.newUser.permission,
+      });
+    }
 
+    // Refresh DataTable after adding or editing user
+    const table = $('#userTable').DataTable();
+    table.destroy();
+
+    setTimeout(() => {
+      $('#userTable').DataTable();  // Reinitialize DataTable
+    }, 0);
+
+    // Close modal
+    $('#modalTambahUser').modal('hide');
+
+    // Reset form
+    this.newUser = {
+      role: '',
+      permission: '',
+    };
+    this.selectedUser = null;  // Clear selected user after saving
+  }
+
+  // Function to edit a user
+  editUser(user: any) {
+    console.log('Edit user:', user);
+    this.selectedUser = user;  // Store selected user for editing
+
+    // Populate the form with the selected user's data
+    this.newUser = { 
+      role: user.role,
+      permission: user.permission,
+    };
+
+    // Open modal for editing
+    $('#modalTambahUser').modal('show');
+  }
+
+  // Function to delete a user
+  deleteUser(user: any) {
+    console.log('Delete user:', user);
+    
+    // Remove user from dataSource
+    const index = this.dataSource.indexOf(user);
+    if (index > -1) {
+      this.dataSource.splice(index, 1);
+    }
+
+    // Refresh DataTable after deletion
+    const table = $('#userTable').DataTable();
+    table.destroy();
+
+    setTimeout(() => {
+      $('#userTable').DataTable();  // Reinitialize DataTable
+    }, 0);
+  }
+
+  openModal() {
+    // Reset form state
+    this.newUser = {
+      role: '',
+      permission: '',
+    };
+    this.selectedUser = null;
   
+    // Buka modal
+    $('#modalTambahUser').modal('show');
+  }
+  closeModal() {
+    this.newUser = {
+      role: '',
+      permission: '',
+    };
+    this.selectedUser = null;
+  
+    $('#modalTambahUser').modal('hide');
+  }
 }

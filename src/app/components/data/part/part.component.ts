@@ -6,19 +6,19 @@ declare var $: any;
 
 @Component({
   standalone: true,
-  selector: 'app-material',
-  templateUrl: './material.component.html',
+  selector: 'app-part',
+  templateUrl: './part.component.html',
   host: { ngSkipHydration: 'true' },
   imports: [CommonModule, FormsModule],
 })
-export class MaterialComponent implements OnInit, AfterViewInit {
+export class PartComponent implements OnInit, AfterViewInit {
   isBrowser: boolean = false;
   dataSource: any[] = [];
 
   // New user data for form
   newUser = {
-    nomor_material: '',
-    nama_material: '',
+    nomor_part: '',
+    nama_part: '',
     qty: '',
   };
 
@@ -48,14 +48,14 @@ export class MaterialComponent implements OnInit, AfterViewInit {
   simpanUser() {
     if (this.selectedUser) {
       // Edit existing user
-      this.selectedUser.nomor_material = this.newUser.nomor_material;
-      this.selectedUser.nama_material = this.newUser.nama_material;
+      this.selectedUser.nomor_part = this.newUser.nomor_part;
+      this.selectedUser.nama_part = this.newUser.nama_part;
       this.selectedUser.qty = this.newUser.qty;
     } else {
       // Add new user
       this.dataSource.push({
-        nomor_material: this.newUser.nomor_material,
-        nama_material: this.newUser.nama_material,
+        nomor_part: this.newUser.nomor_part,
+        nama_part: this.newUser.nama_part,
         qty: this.newUser.qty,
       });
     }
@@ -73,8 +73,8 @@ export class MaterialComponent implements OnInit, AfterViewInit {
 
     // Reset form
     this.newUser = {
-      nomor_material: '',
-      nama_material: '',
+      nomor_part: '',
+      nama_part: '',
       qty: '',
     };
     this.selectedUser = null;  // Clear selected user after saving
@@ -87,8 +87,8 @@ export class MaterialComponent implements OnInit, AfterViewInit {
 
     // Populate the form with the selected user's data
     this.newUser = { 
-      nomor_material: user.nomor_material, 
-      nama_material: user.nama_material, 
+      nomor_part: user.nomor_part, 
+      nama_part: user.nama_part, 
       qty: user.qty,
     };
 
@@ -118,8 +118,8 @@ export class MaterialComponent implements OnInit, AfterViewInit {
   openModal() {
     // Reset form state
     this.newUser = {
-      nomor_material: '',
-      nama_material: '',
+      nomor_part: '',
+      nama_part: '',
       qty: '',
     };
     this.selectedUser = null;
@@ -129,8 +129,8 @@ export class MaterialComponent implements OnInit, AfterViewInit {
   }
   closeModal() {
     this.newUser = {
-      nomor_material: '',
-      nama_material: '',
+      nomor_part: '',
+      nama_part: '',
       qty: '',
     };
     this.selectedUser = null;
