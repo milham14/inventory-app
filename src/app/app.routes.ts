@@ -10,6 +10,8 @@ import { RoleComponent } from './components/data/role/role.component';
 import { PermissionComponent } from './components/data/permission/permission.component';
 import { MaterialComponent } from './components/data/material/material.component';
 import { PartComponent } from './components/data/part/part.component';
+import { SupplierComponent } from './components/data/supplier/supplier.component';
+import { CustomerComponent } from './components/data/customer/customer.component';
 
 export const routes: Routes = [
     {
@@ -51,6 +53,14 @@ export const routes: Routes = [
             {
                 path: 'part',
                 component: PartComponent
+            },
+            {
+                path: 'supplier',
+                component: SupplierComponent
+            },
+            {
+                path: 'customer',
+                component: CustomerComponent
             },
             {
                 path: 'contact',
