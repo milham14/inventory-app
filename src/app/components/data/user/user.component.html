@@ -1,0 +1,92 @@
+<div *ngIf="isBrowser">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a style="color: #3399ff;">Data Master</a></li>
+            <li class="breadcrumb-item active" style="color: #202020;">User</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-6">
+          <span>List User</span>
+        </div>
+        <div class="col-6 text-right">
+          <button class="btn btn-success" (click)="openModal()">Tambah User</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <table id="userTable" class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of dataSource; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ user.nama }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Tambah/Edit User -->
+  <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTambahUserLabel">{{ selectedUser ? 'Edit User' : 'Tambah User' }}</h5>
+          <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="nama">Nama</label>
+              <input id="nama" name="nama" type="text" class="form-control" [(ngModel)]="newUser.nama">
+            </div>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input id="username" name="username" type="text" class="form-control" [(ngModel)]="newUser.username">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" class="form-control" [(ngModel)]="newUser.email">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" class="form-control" [(ngModel)]="newUser.password">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

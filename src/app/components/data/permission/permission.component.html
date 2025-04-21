@@ -1,0 +1,60 @@
+<div *ngIf="isBrowser">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a style="color: #3399ff;">Data Master</a></li>
+            <li class="breadcrumb-item active" style="color: #202020;">Permission</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card">
+    <div class="card-header">List User</div>
+    <div class="card-body">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 w-100">
+
+        <ng-container matColumnDef="no">
+          <th mat-header-cell *matHeaderCellDef>No</th>
+          <td mat-cell *matCellDef="let row">{{ row.no }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nama">
+          <th mat-header-cell *matHeaderCellDef>Nama</th>
+          <td mat-cell *matCellDef="let row">{{ row.nama }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef>Username</th>
+          <td mat-cell *matCellDef="let row">{{ row.username }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>Role</th>
+          <td mat-cell *matCellDef="let row">{{ row.role }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <td mat-cell *matCellDef="let row">
+            <button class="btn btn-primary btn-sm mr-1" (click)="editUser(row)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteUser(row)">Hapus</button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div style="display: flex; justify-content: center; margin-top: 16px;">
+        <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]">
+        </mat-paginator>
+      </div>
+      
+    </div>
+  </div>
+</div>
