@@ -39,9 +39,9 @@
         <tbody>
           <tr *ngFor="let user of dataSource; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ user.nama }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
+            <td>{{ user?.name }}</td>
+            <td>{{ user?.username }}</td>
+            <td>{{ user?.email }}</td>
             <td>
               <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
               <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
@@ -65,8 +65,8 @@
         <div class="modal-body">
           <form>
             <div class="form-group">
-              <label for="nama">Nama</label>
-              <input id="nama" name="nama" type="text" class="form-control" [(ngModel)]="newUser.nama">
+              <label for="name">Nama</label>
+              <input id="name" name="name" type="text" class="form-control" [(ngModel)]="newUser.name">
             </div>
             <div class="form-group">
               <label for="username">Username</label>
@@ -76,7 +76,7 @@
               <label for="email">Email</label>
               <input id="email" name="email" type="email" class="form-control" [(ngModel)]="newUser.email">
             </div>
-            <div class="form-group">
+            <div class="form-group" *ngIf="!selectedUser">
               <label for="password">Password</label>
               <input id="password" name="password" type="password" class="form-control" [(ngModel)]="newUser.password">
             </div>

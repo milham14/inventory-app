@@ -1,11 +1,8 @@
-<div class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-
-</div>
 <div class="wrapper">
 
     <!-- Preloader -->
-    <div class="preloader flex-column justify-content-center align-items-center">
-      <img class="animation__wobble" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+    <div class="preloader flex-column justify-content-center align-items-center" *ngIf="loading">
+      <img class="animation__wobble" src="dist/img/Logo-RPA.png" alt="Logo-RPA" height="60" width="60">
     </div>
   
     <!-- Navbar -->
@@ -45,7 +42,7 @@
           />
         </div>
         <div class="info ms-2">
-          <p class="mb-0 text-white">Admin RPA</p>
+          <p class="mb-0 text-white">{{ user?.name }}</p>
         </div>
         <i class="right fas fa-angle-left ms-auto"></i>
       </div>
@@ -192,7 +189,7 @@
       <!-- Brand Logo -->
       <a [routerLink]="['/admin/dashboard']" class="brand-link">
         <img src="dist/img/Logo-RPA.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Admin RPA</span>
+        <span class="brand-text font-weight-light">{{ user?.name }}</span>
       </a>
   
       <!-- Sidebar -->

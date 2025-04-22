@@ -6,7 +6,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api'; // Laravel API
+  private apiUrl = 'http://127.0.0.1:8000/api'; // Laravel API
   private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this.isLoggedIn());
   loggedIn$ = this.loggedInSubject.asObservable();
 
@@ -20,6 +20,7 @@ export class AuthService {
           if (isPlatformBrowser(this.platformId)) {
             // Hanya set localStorage jika berada di browser
             localStorage.setItem('user', JSON.stringify(response.admin));
+            localStorage.setItem('token', response.token);
           }
           this.loggedInSubject.next(true);  // Memperbarui status login
           console.log('User logged in:', response.admin);
@@ -32,6 +33,7 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       // Hanya akses localStorage jika berada di browser
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
     this.loggedInSubject.next(false); // Memperbarui status login
   }

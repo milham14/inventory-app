@@ -18,14 +18,18 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     this.auth.login(this.username, this.password).subscribe({
-      next: () => {
-        this.router.navigate(['/admin/dashboard']);
+      next: (response) => {
+        // Kirim user lewat navigation state
+        this.router.navigate(['/admin/dashboard'], {
+          state: { user: response.admin }
+        });
       },
       error: (err) => {
         this.errorMessage = err.error.message || 'Login gagal!';
       }
     });
   }
+  
 
   ngOnInit(): void {
     

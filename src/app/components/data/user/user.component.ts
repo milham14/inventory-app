@@ -1,6 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../../services/user/user.service';
 
 declare var $: any;
 
@@ -11,13 +12,13 @@ declare var $: any;
   host: { ngSkipHydration: 'true' },
   imports: [CommonModule, FormsModule],
 })
-export class UserComponent implements OnInit, AfterViewInit {
+export class UserComponent implements OnInit {
   isBrowser: boolean = false;
   dataSource: any[] = [];
 
   // New user data for form
   newUser = {
-    nama: '',
+    name: '',
     username: '',
     email: '',
     password: ''
@@ -26,37 +27,35 @@ export class UserComponent implements OnInit, AfterViewInit {
   // Selected user for editing
   selectedUser: any = null;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private userService: UserService) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.isBrowser = true;
     }
 
-    // Initial data
-    this.dataSource = [];
+    this.loadUser();
   }
 
-  ngAfterViewInit(): void {
-    if (this.isBrowser) {
-      setTimeout(() => {
-        $('#userTable').DataTable();  // Initialize DataTable
-      }, 0);
-    }
+  loadUser() {
+    this.userService.getUsers().subscribe((data) => {
+      this.dataSource = data;
+      setTimeout(() => $('#userTable').DataTable(), 0); // Inisialisasi DataTable
+    });
   }
 
   // Function to save a new user
   simpanUser() {
     if (this.selectedUser) {
       // Edit existing user
-      this.selectedUser.nama = this.newUser.nama;
+      this.selectedUser.name = this.newUser.name;
       this.selectedUser.username = this.newUser.username;
       this.selectedUser.email = this.newUser.email;
       this.selectedUser.password = this.newUser.password;
     } else {
       // Add new user
       this.dataSource.push({
-        nama: this.newUser.nama,
+        name: this.newUser.name,
         username: this.newUser.username,
         email: this.newUser.email,
         password: this.newUser.password
@@ -76,7 +75,7 @@ export class UserComponent implements OnInit, AfterViewInit {
 
     // Reset form
     this.newUser = {
-      nama: '',
+      name: '',
       username: '',
       email: '',
       password: ''
@@ -91,10 +90,10 @@ export class UserComponent implements OnInit, AfterViewInit {
 
     // Populate the form with the selected user's data
     this.newUser = { 
-      nama: user.nama, 
+      name: user?.name, 
       username: user.username, 
       email: user.email, 
-      password: user.password // Password won't be pre-filled for security reasons
+      password: user?.password // Password won't be pre-filled for security reasons
     };
 
     // Open modal for editing
@@ -123,7 +122,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   openModal() {
     // Reset form state
     this.newUser = {
-      nama: '',
+      name: '',
       username: '',
       email: '',
       password: ''
@@ -135,7 +134,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
   closeModal() {
     this.newUser = {
-      nama: '',
+      name: '',
       username: '',
       email: '',
       password: ''
