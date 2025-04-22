@@ -44,43 +44,34 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // Function to save a new user
+  // Function to save or update a user
   simpanUser() {
     if (this.selectedUser) {
-      // Edit existing user
-      this.selectedUser.name = this.newUser.name;
-      this.selectedUser.username = this.newUser.username;
-      this.selectedUser.email = this.newUser.email;
-      this.selectedUser.password = this.newUser.password;
+      // Update existing user
+      this.userService.updateUser(this.selectedUser.id, this.newUser).subscribe((response) => {
+        const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
+        if (index > -1) {
+          this.dataSource[index] = response;  // Update data in dataSource
+        }
+
+        // Refresh DataTable
+        this.refreshDataTable();
+
+        // Close modal and reset form
+        this.closeModal();
+      });
     } else {
-      // Add new user
-      this.dataSource.push({
-        name: this.newUser.name,
-        username: this.newUser.username,
-        email: this.newUser.email,
-        password: this.newUser.password
+      // Create new user
+      this.userService.createUser(this.newUser).subscribe((response) => {
+        this.dataSource.push(response);  // Add new user to dataSource
+
+        // Refresh DataTable
+        this.refreshDataTable();
+
+        // Close modal and reset form
+        this.closeModal();
       });
     }
-
-    // Refresh DataTable after adding or editing user
-    const table = $('#userTable').DataTable();
-    table.destroy();
-
-    setTimeout(() => {
-      $('#userTable').DataTable();  // Reinitialize DataTable
-    }, 0);
-
-    // Close modal
-    $('#modalTambahUser').modal('hide');
-
-    // Reset form
-    this.newUser = {
-      name: '',
-      username: '',
-      email: '',
-      password: ''
-    };
-    this.selectedUser = null;  // Clear selected user after saving
   }
 
   // Function to edit a user
@@ -93,7 +84,7 @@ export class UserComponent implements OnInit {
       name: user?.name, 
       username: user.username, 
       email: user.email, 
-      password: user?.password // Password won't be pre-filled for security reasons
+      password: ''  // Password won't be pre-filled for security reasons
     };
 
     // Open modal for editing
@@ -103,20 +94,17 @@ export class UserComponent implements OnInit {
   // Function to delete a user
   deleteUser(user: any) {
     console.log('Delete user:', user);
-    
-    // Remove user from dataSource
-    const index = this.dataSource.indexOf(user);
-    if (index > -1) {
-      this.dataSource.splice(index, 1);
-    }
 
-    // Refresh DataTable after deletion
-    const table = $('#userTable').DataTable();
-    table.destroy();
+    this.userService.deleteUser(user.id).subscribe(() => {
+      // Remove user from dataSource
+      const index = this.dataSource.indexOf(user);
+      if (index > -1) {
+        this.dataSource.splice(index, 1);
+      }
 
-    setTimeout(() => {
-      $('#userTable').DataTable();  // Reinitialize DataTable
-    }, 0);
+      // Refresh DataTable
+      this.refreshDataTable();
+    });
   }
 
   openModal() {
@@ -128,10 +116,11 @@ export class UserComponent implements OnInit {
       password: ''
     };
     this.selectedUser = null;
-  
+
     // Buka modal
     $('#modalTambahUser').modal('show');
   }
+
   closeModal() {
     this.newUser = {
       name: '',
@@ -140,7 +129,16 @@ export class UserComponent implements OnInit {
       password: ''
     };
     this.selectedUser = null;
-  
+
     $('#modalTambahUser').modal('hide');
+  }
+
+  // Function to refresh DataTable
+  refreshDataTable() {
+    const table = $('#userTable').DataTable();
+    table.destroy();
+    setTimeout(() => {
+      $('#userTable').DataTable();  // Reinitialize DataTable
+    }, 0);
   }
 }
