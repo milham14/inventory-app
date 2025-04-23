@@ -40,6 +40,7 @@ export class AdminComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     }
+    
   }
 
   /** 
@@ -63,12 +64,12 @@ export class AdminComponent implements OnInit {
     event.stopPropagation();
     this.acceptMaterialOpen = !this.acceptMaterialOpen;
   }
+  
 
   /** Hanya logout waktu tombol logout diklik */
   onLogoutClick(event: MouseEvent) {
     event.stopPropagation();
-    /**localStorage.removeItem('token'); */
-    this.router.navigate(['/login']);
+    this.auth.logout();
   }
 
   /** Tutup menu kalau klik di luar treeview */

@@ -43,6 +43,167 @@
                Parts
                Supplier
                Customer
+
+
+               import { Injectable, Inject, PLATFORM_ID, NgZone } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, fromEvent, merge } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private intervalId: any;
+  private inactivityTimeoutId: any;
+  private inactivityTime = 1 * 60 * 1000;
+  private apiUrl = 'http://127.0.0.1:8000/api';
+  private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this.isLoggedIn());
+  loggedIn$ = this.loggedInSubject.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router,
+    private ngZone: NgZone
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.initInactivityListener();
+    }
+  }
+
+  login(username: string, password: string) {
+    return this.http.post<any>(`${this.apiUrl}/login`, { username, password }).pipe(
+      tap(response => {
+        if (response.status === 'success') {
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('user', JSON.stringify(response.admin));
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('login_time', new Date().toString());
+          }
+          this.loggedInSubject.next(true);
+          this.startSessionMonitor();
+          this.resetInactivityTimer(); // Reset timer saat login berhasil
+        }
+      })
+    );
+  }
+
+  logout() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.clearSession();
+      return;
+    }
+
+    this.http.post(`${this.apiUrl}/logout`, {}, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: () => this.clearSession(),
+      error: () => this.clearSession()
+    });
+  }
+
+  private clearSession() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('login_time');
+    }
+
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+
+    if (this.inactivityTimeoutId) {
+      clearTimeout(this.inactivityTimeoutId);
+      this.inactivityTimeoutId = null;
+    }
+
+    this.loggedInSubject.next(false);
+    this.router.navigate(['/login']);
+  }
+
+  isLoggedIn(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem('user');
+    }
+    return false;
+  }
+
+  getUser() {
+    if (isPlatformBrowser(this.platformId)) {
+      return JSON.parse(localStorage.getItem('user')!);
+    }
+    return null;
+  }
+
+  private startSessionMonitor() {
+    this.intervalId = setInterval(() => {
+      this.checkSessionTimeout();
+    }, 30000); // setiap 30 detik
+  }
+
+  private checkSessionTimeout() {
+    const loginTime = localStorage.getItem('login_time');
+    if (loginTime) {
+      const timePassed = new Date().getTime() - new Date(loginTime).getTime();
+      if (timePassed > this.inactivityTime) {
+        this.logout();
+      }
+    }
+  }
+
+  public checkTokenValidity(): Observable<boolean> {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        return this.http.get(`${this.apiUrl}/me`, {
+          headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+        }).pipe(
+          map(() => true),
+          catchError(() => {
+            this.clearSession();
+            return of(false);
+          })
+        );
+      }
+    }
+    return of(false);
+  }
+
+  private initInactivityListener() {
+    this.ngZone.runOutsideAngular(() => {
+      const activityEvents = [
+        fromEvent(window, 'mousemove'),
+        fromEvent(window, 'keydown'),
+        fromEvent(window, 'click'),
+        fromEvent(window, 'scroll'),
+        fromEvent(window, 'touchstart')
+      ];
+
+      merge(...activityEvents).subscribe(() => {
+        this.resetInactivityTimer();
+      });
+    });
+  }
+
+  private resetInactivityTimer() {
+    if (!this.isLoggedIn()) return;
+
+    if (this.inactivityTimeoutId) {
+      clearTimeout(this.inactivityTimeoutId);
+    }
+
+    this.inactivityTimeoutId = setTimeout(() => {
+      console.warn('Tidak ada aktivitas. Melakukan logout otomatis.');
+      this.logout();
+    }, this.inactivityTime);
+  }
+}
+
+
                 <div class="col-8">
                   <div class="icheck-primary">
                     <input type="checkbox" id="remember">

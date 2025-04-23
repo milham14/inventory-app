@@ -12,6 +12,7 @@ import { MaterialComponent } from './components/data/material/material.component
 import { PartComponent } from './components/data/part/part.component';
 import { SupplierComponent } from './components/data/supplier/supplier.component';
 import { CustomerComponent } from './components/data/customer/customer.component';
+import { authGuard } from './components/auth/auth.guard';
 
 export const routes: Routes = [
     {
@@ -25,6 +26,7 @@ export const routes: Routes = [
     {
         path: 'admin',
         component: AdminComponent,
+        canActivate:[authGuard],
         children: [
             {
                 path: '',
