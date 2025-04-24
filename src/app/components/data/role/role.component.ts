@@ -1,140 +1,113 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { RoleService } from '../../../services/role/role.service';
+import { PermissionService } from '../../../services/permission/permission.service';  // Tambahkan service permission
 declare var $: any;
 
 @Component({
   standalone: true,
-  selector: 'app-user',
+  selector: 'app-role',
   templateUrl: './role.component.html',
   host: { ngSkipHydration: 'true' },
   imports: [CommonModule, FormsModule],
 })
-export class RoleComponent implements OnInit, AfterViewInit {
+export class RoleComponent implements OnInit {
   isBrowser: boolean = false;
   dataSource: any[] = [];
 
-  // New user data for form
-  newUser = {
-    nama: '',
-    username: '',
-    role: '',
+  // Form input
+  newRole = {
+    name: '',
+    permissions: [] as number[], // Tambahkan field untuk permission IDs
   };
 
-  // Selected user for editing
-  selectedUser: any = null;
+  selectedRole: any = null;
+  allPermissions: any[] = []; // List permission dari database
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private roleService: RoleService,
+    private permissionService: PermissionService // Inject PermissionService
+  ) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.isBrowser = true;
     }
 
-    // Initial data
-    this.dataSource = [];
+    this.loadPermissions();
+    this.LoadUser();
   }
 
-  ngAfterViewInit(): void {
-    if (this.isBrowser) {
-      setTimeout(() => {
-        $('#userTable').DataTable();  // Initialize DataTable
-      }, 0);
-    }
+  LoadUser() {
+    this.roleService.getRoles().subscribe((data) => {
+      this.dataSource = data;
+      setTimeout(() => $('#roleTable').DataTable(), 0);
+    });
   }
 
-  // Function to save a new user
-  simpanUser() {
-    if (this.selectedUser) {
-      // Edit existing user
-      this.selectedUser.nama = this.newUser.nama;
-      this.selectedUser.username = this.newUser.username;
-      this.selectedUser.role = this.newUser.role;
+  loadPermissions() {
+    this.permissionService.getPermissions().subscribe((data) => {
+      this.allPermissions = data;
+    });
+  }
+
+  simpanRole() {
+    if (this.selectedRole) {
+      // Update
+      this.roleService.updateRole(this.selectedRole.id, this.newRole).subscribe((response) => {
+        const index = this.dataSource.findIndex((role) => role.id === this.selectedRole.id);
+        if (index > -1) {
+          this.dataSource[index] = response;
+        }
+        this.refreshTable();
+        this.closeModal();
+      });
     } else {
-      // Add new user
-      this.dataSource.push({
-        nama: this.newUser.nama,
-        username: this.newUser.username,
-        role: this.newUser.role,
+      // Create
+      this.roleService.createRole(this.newRole).subscribe((response) => {
+        this.dataSource.push(response);
+        this.refreshTable();
+        this.closeModal();
       });
     }
-
-    // Refresh DataTable after adding or editing user
-    const table = $('#userTable').DataTable();
-    table.destroy();
-
-    setTimeout(() => {
-      $('#userTable').DataTable();  // Reinitialize DataTable
-    }, 0);
-
-    // Close modal
-    $('#modalTambahUser').modal('hide');
-
-    // Reset form
-    this.newUser = {
-      nama: '',
-      username: '',
-      role: '',
-    };
-    this.selectedUser = null;  // Clear selected user after saving
   }
 
-  // Function to edit a user
-  editUser(user: any) {
-    console.log('Edit user:', user);
-    this.selectedUser = user;  // Store selected user for editing
-
-    // Populate the form with the selected user's data
-    this.newUser = { 
-      nama: user.nama, 
-      username: user.username, 
-      role: user.role,
+  editRole(role: any) {
+    this.selectedRole = role;
+    this.newRole = {
+      name: role?.name,
+      permissions: role?.permissions?.map((p: any) => p.id) || [], // Isi list permission
     };
-
-    // Open modal for editing
-    $('#modalTambahUser').modal('show');
+    $('#modalTambahRole').modal('show');
   }
 
-  // Function to delete a user
-  deleteUser(user: any) {
-    console.log('Delete user:', user);
-    
-    // Remove user from dataSource
-    const index = this.dataSource.indexOf(user);
-    if (index > -1) {
-      this.dataSource.splice(index, 1);
-    }
+  deleteRole(role: any) {
+    this.roleService.deleteRole(role.id).subscribe(() => {
+      const index = this.dataSource.indexOf(role);
+      if (index > -1) {
+        this.dataSource.splice(index, 1);
+      }
+      this.refreshTable();
+    });
+  }
 
-    // Refresh DataTable after deletion
-    const table = $('#userTable').DataTable();
+  refreshTable() {
+    const table = $('#roleTable').DataTable();
     table.destroy();
-
-    setTimeout(() => {
-      $('#userTable').DataTable();  // Reinitialize DataTable
-    }, 0);
+    setTimeout(() => $('#roleTable').DataTable(), 0);
   }
 
   openModal() {
-    // Reset form state
-    this.newUser = {
-      nama: '',
-      username: '',
-      role: '',
-    };
-    this.selectedUser = null;
-  
-    // Buka modal
-    $('#modalTambahUser').modal('show');
+    this.newRole = { name: '', permissions: [] };
+    this.selectedRole = null;
+    $('#modalTambahRole').modal('show');
   }
+
   closeModal() {
-    this.newUser = {
-      nama: '',
-      username: '',
-      role: '',
-    };
-    this.selectedUser = null;
-  
-    $('#modalTambahUser').modal('hide');
+    this.newRole = { name: '', permissions: [] };
+    this.selectedRole = null;
+    $('#modalTambahRole').modal('hide');
   }
 }

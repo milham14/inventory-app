@@ -1,4 +1,5 @@
 <div *ngIf="isBrowser">
+  <!-- Breadcrumb -->
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
@@ -13,6 +14,7 @@
     </div>
   </section>
 
+  <!-- Role Table -->
   <div class="card">
     <div class="card-header">
       <div class="row align-items-center">
@@ -20,31 +22,27 @@
           <span>List Role</span>
         </div>
         <div class="col-6 text-right">
-          <button class="btn btn-success" (click)="openModal()">Tambah User</button>
+          <button class="btn btn-success" (click)="openModal()">Tambah Role</button>
         </div>
       </div>
     </div>
 
     <div class="card-body">
-      <table id="userTable" class="table table-bordered table-striped">
+      <table id="roleTable" class="table table-bordered table-striped">
         <thead>
           <tr>
             <th>No</th>
-            <th>Nama</th>
-            <th>Username</th>
             <th>Role</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of dataSource; let i = index">
+          <tr *ngFor="let role of dataSource; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ user.nama }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.role }}</td>
+            <td>{{ role.name }}</td>
             <td>
-              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editRole(role)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteRole(role)">Hapus</button>
             </td>
           </tr>
         </tbody>
@@ -52,35 +50,56 @@
     </div>
   </div>
 
-  <!-- Modal Tambah/Edit User -->
-  <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+  <!-- Modal Tambah/Edit Role -->
+  <div class="modal fade" id="modalTambahRole" tabindex="-1" role="dialog" aria-labelledby="modalTambahRoleLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTambahUserLabel">{{ selectedUser ? 'Edit User' : 'Tambah User' }}</h5>
+          <h5 class="modal-title" id="modalTambahRoleLabel">{{ selectedRole ? 'Edit Role' : 'Tambah Role' }}</h5>
           <button type="button" class="close" (click)="closeModal()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+
         <div class="modal-body">
           <form>
             <div class="form-group">
-              <label for="nama">Nama</label>
-              <input id="nama" name="nama" type="text" class="form-control" [(ngModel)]="newUser.nama">
+              <label for="name">Nama Role</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                class="form-control"
+                [(ngModel)]="newRole.name"
+                required
+              />
             </div>
+
             <div class="form-group">
-              <label for="username">Username</label>
-              <input id="username" name="username" type="text" class="form-control" [(ngModel)]="newUser.username">
-            </div>
-            <div class="form-group">
-              <label for="email">Role</label>
-              <input id="role" name="role" type="role" class="form-control" [(ngModel)]="newUser.role">
+              <label for="permissions">Permissions</label>
+              <select
+                id="permissions"
+                class="form-control selectpicker"
+                multiple
+                [(ngModel)]="newRole.permissions"
+                name="permissions"
+                data-live-search="true"
+                title="Pilih Permissions"
+              >
+                <option *ngFor="let perm of allPermissions" [value]="perm.id">
+                  {{ perm.name }}
+                </option>
+              </select>
+              <small class="form-text text-muted">Pilih lebih dari satu permission.</small>
             </div>
           </form>
         </div>
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Batal</button>
+          <button type="button" class="btn btn-primary" (click)="simpanRole()">
+            {{ selectedRole ? 'Update' : 'Simpan' }}
+          </button>
         </div>
       </div>
     </div>

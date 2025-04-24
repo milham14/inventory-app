@@ -20,29 +20,27 @@
           <span>List Permission</span>
         </div>
         <div class="col-6 text-right">
-          <button class="btn btn-success" (click)="openModal()">Tambah User</button>
+          <button class="btn btn-success" (click)="openModal()">Tambah Permission</button>
         </div>
       </div>
     </div>
 
     <div class="card-body">
-      <table id="userTable" class="table table-bordered table-striped">
+      <table id="permissionTable" class="table table-bordered table-striped">
         <thead>
           <tr>
             <th>No</th>
-            <th>Role</th>
             <th>Permission</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of dataSource; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.permission }}</td>
+          <tr *ngFor="let item of dataSource; let i = index">
+            <td>{{ i + 1 }}</td> <!-- Menampilkan nomor urut -->
+            <td>{{ item.name }}</td> <!-- Mengakses nama role di kolom 'name' -->
             <td>
-              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(item)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(item)">Hapus</button>
             </td>
           </tr>
         </tbody>
@@ -50,12 +48,12 @@
     </div>
   </div>
 
-  <!-- Modal Tambah/Edit User -->
-  <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+  <!-- Modal Tambah/Edit Role -->
+  <div class="modal fade" id="modalTambahPermission" tabindex="-1" role="dialog" aria-labelledby="modalTambahPermissionLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTambahUserLabel">{{ selectedUser ? 'Edit User' : 'Tambah User' }}</h5>
+          <h5 class="modal-title" id="modalTambahPermissionLabel">{{ selectedPermission ? 'Edit Role' : 'Tambah Role' }}</h5>
           <button type="button" class="close" (click)="closeModal()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -63,18 +61,14 @@
         <div class="modal-body">
           <form>
             <div class="form-group">
-              <label for="role">Role</label>
-              <input id="role" name="role" type="text" class="form-control" [(ngModel)]="newUser.role">
-            </div>
-            <div class="form-group">
-              <label for="permission">Permission</label>
-              <input id="permission" name="permission" type="text" class="form-control" [(ngModel)]="newUser.permission">
+              <label for="name">Permission</label>
+              <input id="name" name="name" type="text" class="form-control" [(ngModel)]="newPermission.name">
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Batal</button>
+          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedPermission ? 'Update' : 'Simpan' }}</button>
         </div>
       </div>
     </div>
