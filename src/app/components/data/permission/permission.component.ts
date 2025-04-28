@@ -14,6 +14,7 @@ declare var $: any;
 })
 export class PermissionComponent implements OnInit {
   isBrowser: boolean = false;
+  permissionToDelete: any = null;
   dataSource: any[] = [];
 
   // New user data for form
@@ -35,41 +36,37 @@ export class PermissionComponent implements OnInit {
   }
 
   loadUser() {
+    const table = $('#permissionTable').DataTable();
+    if (table) {
+      table.destroy(); // Hancurkan datatable dulu supaya tidak conflict
+    }
+  
     this.permissionService.getPermissions().subscribe((data) => {
       this.dataSource = data;
-      setTimeout(() => $('#permissionTable').DataTable(), 0); // Inisialisasi DataTable
+      setTimeout(() => {
+        $('#permissionTable').DataTable(); // Reinitialize DataTable setelah data selesai load
+      }, 0);
     });
   }
+  
 
   // Function to save or update a user
   simpanUser() {
-    if (this.selectedPermission) {
-      // Update existing user
-      this.permissionService.updatePermission(this.selectedPermission.id, this.newPermission).subscribe((response) => {
-        const index = this.dataSource.findIndex(permission => permission.id === this.selectedPermission.id);
-        if (index > -1) {
-          this.dataSource[index] = response;  // Update data in dataSource
-        }
-
-        // Refresh DataTable
-        this.refreshDataTable();
-
-        // Close modal and reset form
+    const request$ = this.selectedPermission
+      ? this.permissionService.updatePermission(this.selectedPermission.id, this.newPermission)
+      : this.permissionService.createPermission(this.newPermission);
+  
+    request$.subscribe({
+      next: () => {
+        this.loadUser(); // Pindah di sini supaya hanya reload setelah sukses
         this.closeModal();
-      });
-    } else {
-      // Create new user
-      this.permissionService.createPermission(this.newPermission).subscribe((response) => {
-        this.dataSource.push(response);  // Add new user to dataSource
-
-        // Refresh DataTable
-        this.refreshDataTable();
-
-        // Close modal and reset form
-        this.closeModal();
-      });
-    }
+      },
+      error: (err) => {
+        console.error('Gagal menyimpan permission', err);
+      }
+    });
   }
+  
 
   // Function to edit a user
   editUser(permission: any) {
@@ -87,18 +84,26 @@ export class PermissionComponent implements OnInit {
 
   // Function to delete a user
   deleteUser(permission: any) {
-    console.log('Delete user:', permission);
+    this.permissionToDelete = permission;
+    $('#confirmDeleteModal').modal('show');
+  }
 
-    this.permissionService.deletePermission(permission.id).subscribe(() => {
-      // Remove user from dataSource
-      const index = this.dataSource.indexOf(permission);
-      if (index > -1) {
+  closeConfirmDelete(){
+    this.permissionToDelete = null;
+    $('#confirmDeleteModal').modal('hide');
+  }
+
+  confirmDelete() {
+    if (!this.permissionToDelete) return;
+
+    this.permissionService.deletePermission(this.permissionToDelete.id).subscribe(() => {
+      const index = this.dataSource.indexOf(this.permissionToDelete);
+      if (index > -1 ) {
         this.dataSource.splice(index, 1);
       }
-
-      // Refresh DataTable
       this.refreshDataTable();
-    });
+      this.closeConfirmDelete();
+    })
   }
 
   openModal() {

@@ -19,6 +19,10 @@ export class UserService {
   updateUser(id: number, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, data);
   }
+  
+  updateRole(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/role`, data);  // Menambahkan path spesifik untuk pembaruan role
+  }
 
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);

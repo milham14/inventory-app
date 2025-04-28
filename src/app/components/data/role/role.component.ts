@@ -14,6 +14,7 @@ declare var $: any;
 })
 export class RoleComponent implements OnInit {
   isBrowser: boolean = false;
+  roleToDelete: any = null;
   dataSource: any[] = [];
 
   // Form input
@@ -41,6 +42,11 @@ export class RoleComponent implements OnInit {
   }
 
   LoadUser() {
+    const table = $('roleTable').DataTable();
+    if (table) {
+      table.destroy();
+    }
+    
     this.roleService.getRoles().subscribe((data) => {
       this.dataSource = data;
       setTimeout(() => $('#roleTable').DataTable(), 0);
@@ -54,25 +60,22 @@ export class RoleComponent implements OnInit {
   }
 
   simpanRole() {
-    if (this.selectedRole) {
-      // Update
-      this.roleService.updateRole(this.selectedRole.id, this.newRole).subscribe((response) => {
-        const index = this.dataSource.findIndex((role) => role.id === this.selectedRole.id);
-        if (index > -1) {
-          this.dataSource[index] = response;
-        }
-        this.refreshTable();
+    const request$ = this.selectedRole
+      ? this.roleService.updateRole(this.selectedRole.id, this.newRole)
+      : this.roleService.createRole(this.newRole);
+  
+    request$.subscribe({
+      next: () => {
+        this.LoadUser(); // Reload data biar tampilan table langsung update
         this.closeModal();
-      });
-    } else {
-      // Create
-      this.roleService.createRole(this.newRole).subscribe((response) => {
-        this.dataSource.push(response);
-        this.refreshTable();
-        this.closeModal();
-      });
-    }
+      },
+      error: (err) => {
+        console.error('Gagal menyimpan role', err);
+        // Optional: kasih notif error pakai toastr atau alert
+      }
+    });
   }
+  
 
   editRole(role: any) {
     this.selectedRole = role;
@@ -84,14 +87,28 @@ export class RoleComponent implements OnInit {
   }
 
   deleteRole(role: any) {
-    this.roleService.deleteRole(role.id).subscribe(() => {
-      const index = this.dataSource.indexOf(role);
+    this.roleToDelete = role;
+    $('#confirmDeleteModal').modal('show');
+  }
+
+  closeConfirmDelete() {
+    this.roleToDelete = null;
+    $('#confirmDeleteModal').modal('hide');
+  }
+
+  confirmDelete() {
+    if (!this.roleToDelete) return;
+  
+    this.roleService.deleteRole(this.roleToDelete.id).subscribe(() => {
+      const index = this.dataSource.indexOf(this.roleToDelete);
       if (index > -1) {
         this.dataSource.splice(index, 1);
       }
       this.refreshTable();
+      this.closeConfirmDelete();
     });
   }
+  
 
   refreshTable() {
     const table = $('#roleTable').DataTable();

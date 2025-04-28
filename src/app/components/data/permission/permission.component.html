@@ -73,4 +73,28 @@
       </div>
     </div>
   </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Hapus</h5>
+        <button type="button" class="close" (click)="closeConfirmDelete()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin menghapus Permission <strong>{{ permissionToDelete?.name }}</strong>?</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmDelete()">Batal</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>

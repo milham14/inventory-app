@@ -25,12 +25,20 @@ export class AuthService {
     }
   }
 
+  getRoleId(): number {
+    if (isPlatformBrowser(this.platformId)) {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user).role_id : 0;  // Mengambil role_id dari user yang disimpan di localStorage
+    }
+    return 0;
+  }  
+
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, { username, password }).pipe(
       tap(response => {
         if (response.status === 'success') {
           if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('user', JSON.stringify(response.admin));
+            localStorage.setItem('user', JSON.stringify(response.user));
             localStorage.setItem('token', response.token);
           }
           this.loggedInSubject.next(true);

@@ -2,6 +2,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user/user.service';
+import { RoleService } from '../../../services/role/role.service';
 
 declare var $: any;
 
@@ -14,20 +15,27 @@ declare var $: any;
 })
 export class UserComponent implements OnInit {
   isBrowser: boolean = false;
+  userToDelete: any = null;
   dataSource: any[] = [];
-
+  roleData: any[] = []; // Data untuk role
+  
   // New user data for form
   newUser = {
     name: '',
     username: '',
     email: '',
-    password: ''
+    password: '',
+    role_id: null // Menambahkan role_id
   };
 
   // Selected user for editing
   selectedUser: any = null;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private userService: UserService) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private userService: UserService,
+    private roleService: RoleService // Menambahkan RoleService
+  ) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -35,6 +43,7 @@ export class UserComponent implements OnInit {
     }
 
     this.loadUser();
+    this.loadRoles(); // Memuat data role
   }
 
   loadUser() {
@@ -44,34 +53,68 @@ export class UserComponent implements OnInit {
     });
   }
 
+  // Fungsi untuk memuat role
+  loadRoles() {
+    this.roleService.getRoles().subscribe((data) => {
+      this.roleData = data; // Menyimpan role dalam roleData
+    });
+  }
+
   // Function to save or update a user
   simpanUser() {
     if (this.selectedUser) {
-      // Update existing user
-      this.userService.updateUser(this.selectedUser.id, this.newUser).subscribe((response) => {
-        const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
-        if (index > -1) {
-          this.dataSource[index] = response;  // Update data in dataSource
-        }
-
-        // Refresh DataTable
-        this.refreshDataTable();
-
-        // Close modal and reset form
-        this.closeModal();
-      });
+      // Jika hanya role_id yang berubah
+      if (this.selectedUser.role_id !== this.newUser.role_id) {
+        // Update role_id saja
+        this.updateRole();
+      } else {
+        // Update user secara keseluruhan
+        this.updateUser();
+      }
     } else {
       // Create new user
       this.userService.createUser(this.newUser).subscribe((response) => {
         this.dataSource.push(response);  // Add new user to dataSource
 
         // Refresh DataTable
-        this.refreshDataTable();
+        this.loadUser();
 
         // Close modal and reset form
         this.closeModal();
       });
     }
+  }
+
+  // Fungsi untuk memperbarui hanya role_id
+  updateRole() {
+    this.userService.updateRole(this.selectedUser.id, { role_id: this.newUser.role_id }).subscribe((response) => {
+      const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
+      if (index > -1) {
+        this.dataSource[index].role_id = response.role_id;  // Update role_id di dataSource
+      }
+
+      // Refresh DataTable
+      this.loadUser();
+
+      // Close modal and reset form
+      this.closeModal();
+    });
+  }
+
+  // Fungsi untuk memperbarui user secara keseluruhan
+  updateUser() {
+    this.userService.updateUser(this.selectedUser.id, this.newUser).subscribe((response) => {
+      const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
+      if (index > -1) {
+        this.dataSource[index] = response;  // Update data user di dataSource
+      }
+
+      // Refresh DataTable
+      this.loadUser();
+
+      // Close modal and reset form
+      this.closeModal();
+    });
   }
 
   // Function to edit a user
@@ -84,7 +127,8 @@ export class UserComponent implements OnInit {
       name: user?.name, 
       username: user.username, 
       email: user.email, 
-      password: ''  // Password won't be pre-filled for security reasons
+      password: '',  // Password won't be pre-filled for security reasons
+      role_id: user.role_id  // Menambahkan role_id untuk editing
     };
 
     // Open modal for editing
@@ -92,19 +136,27 @@ export class UserComponent implements OnInit {
   }
 
   // Function to delete a user
-  deleteUser(user: any) {
-    console.log('Delete user:', user);
+  deleteUser(permission: any) {
+    this.userToDelete = permission;
+    $('#confirmDeleteModal').modal('show');
+  }
 
-    this.userService.deleteUser(user.id).subscribe(() => {
-      // Remove user from dataSource
-      const index = this.dataSource.indexOf(user);
-      if (index > -1) {
+  closeConfirmDelete(){
+    this.userToDelete = null;
+    $('#confirmDeleteModal').modal('hide');
+  }
+
+  confirmDelete() {
+    if (!this.userToDelete) return;
+
+    this.userService.deleteUser(this.userToDelete.id).subscribe(() => {
+      const index = this.dataSource.indexOf(this.userToDelete);
+      if (index > -1 ) {
         this.dataSource.splice(index, 1);
       }
-
-      // Refresh DataTable
       this.refreshDataTable();
-    });
+      this.closeConfirmDelete();
+    })
   }
 
   openModal() {
@@ -113,7 +165,8 @@ export class UserComponent implements OnInit {
       name: '',
       username: '',
       email: '',
-      password: ''
+      password: '',
+      role_id: null // Reset role_id
     };
     this.selectedUser = null;
 
@@ -126,7 +179,8 @@ export class UserComponent implements OnInit {
       name: '',
       username: '',
       email: '',
-      password: ''
+      password: '',
+      role_id: null // Reset role_id
     };
     this.selectedUser = null;
 

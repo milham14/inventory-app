@@ -13,6 +13,8 @@ import { PartComponent } from './components/data/part/part.component';
 import { SupplierComponent } from './components/data/supplier/supplier.component';
 import { CustomerComponent } from './components/data/customer/customer.component';
 import { authGuard } from './components/auth/auth.guard';
+import { ForbiddenComponent } from './forbidden/forbidden.component';
+import { RoleGuard } from './components/auth/role.guard';
 
 export const routes: Routes = [
     {
@@ -38,31 +40,45 @@ export const routes: Routes = [
             },
             {
                 path: 'user',
-                component: UserComponent
+                component: UserComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'role',
-                component: RoleComponent
+                component: RoleComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'permission',
-                component: PermissionComponent
+                component: PermissionComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'material',
-                component: MaterialComponent
+                component: MaterialComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'part',
-                component: PartComponent
+                component: PartComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'supplier',
-                component: SupplierComponent
+                component: SupplierComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'customer',
-                component: CustomerComponent
+                component: CustomerComponent,
+                canActivate: [RoleGuard],
+                data: { role: 1 } 
             },
             {
                 path: 'contact',
@@ -78,4 +94,5 @@ export const routes: Routes = [
             }
         ]
     },
+    { path: 'forbidden', component: ForbiddenComponent },
 ];

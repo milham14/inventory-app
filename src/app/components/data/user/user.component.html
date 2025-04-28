@@ -33,6 +33,7 @@
             <th>Nama</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Role</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -42,6 +43,7 @@
             <td>{{ user?.name }}</td>
             <td>{{ user?.username }}</td>
             <td>{{ user?.email }}</td>
+            <td>{{ user.role?.name }}</td>
             <td>
               <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
               <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
@@ -76,6 +78,12 @@
               <label for="email">Email</label>
               <input id="email" name="email" type="email" class="form-control" [(ngModel)]="newUser.email">
             </div>
+            <div class="form-group">
+              <label for="role">Role</label>
+              <select id="role" name="role_id" class="form-control" [(ngModel)]="newUser.role_id">
+                <option *ngFor="let role of roleData" [value]="role.id">{{ role.name }}</option>
+              </select>
+            </div>
             <div class="form-group" *ngIf="!selectedUser">
               <label for="password">Password</label>
               <input id="password" name="password" type="password" class="form-control" [(ngModel)]="newUser.password">
@@ -83,10 +91,34 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">Batal</button>
-          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="simpanUser()">Save</button>
         </div>
       </div>
     </div>
   </div>
+
+      <!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Hapus</h5>
+        <button type="button" class="close" (click)="closeConfirmDelete()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin menghapus Permission <strong>{{ userToDelete?.name }}</strong>?</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmDelete()">Batal</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>

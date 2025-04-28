@@ -14,6 +14,7 @@ export class AdminComponent implements OnInit {
   masterDataOpen = false;
   acceptMaterialOpen = false;
   user: any;
+  roleId: number = 0;
   loading = true;
 
   constructor(private router:Router, @Inject(PLATFORM_ID) private platformId: Object, private auth: AuthService) {}
@@ -40,7 +41,13 @@ export class AdminComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     }
+
+    this.roleId = this.auth.getRoleId();
     
+  }
+
+  hasRole(roleId: number): boolean {
+    return this.roleId === roleId;
   }
 
   /** 
