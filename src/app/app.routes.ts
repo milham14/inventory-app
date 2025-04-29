@@ -41,44 +41,37 @@ export const routes: Routes = [
             {
                 path: 'user',
                 component: UserComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'role',
                 component: RoleComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'permission',
                 component: PermissionComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'material',
                 component: MaterialComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'part',
                 component: PartComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'supplier',
                 component: SupplierComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'customer',
                 component: CustomerComponent,
-                canActivate: [RoleGuard],
-                data: { role: 1 } 
+                canActivate: [RoleGuard]
             },
             {
                 path: 'contact',

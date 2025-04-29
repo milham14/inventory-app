@@ -13,9 +13,18 @@ export class AdminComponent implements OnInit {
   userMenuOpen = false;
   masterDataOpen = false;
   acceptMaterialOpen = false;
+  canViewDataMaster: boolean = false;
+  canViewDataMaterial: boolean = false;
   user: any;
   roleId: number = 0;
   loading = true;
+  canViewUser: boolean = false;
+  canViewRole: boolean = false;
+  canViewPermission: boolean = false;
+  canViewMaterial: boolean = false;
+  canViewPart: boolean = false;
+  canViewSupplier: boolean = false;
+  canViewCustomer: boolean = false;
 
   constructor(private router:Router, @Inject(PLATFORM_ID) private platformId: Object, private auth: AuthService) {}
 
@@ -40,11 +49,35 @@ export class AdminComponent implements OnInit {
       } else {
         this.router.navigate(['/login']);
       }
+          // Mengambil data pengguna dari localStorage
+   // this.user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Mengecek apakah pengguna memiliki izin untuk melihat Data Master
+   // this.canViewDataMaster = this.user.role?.permissions.some((permission: { name: string; }) => permission.name === 'view.datamaster');
+
+    // Mengecek apakah pengguna memiliki izin untuk melihat Material
+   // this.canViewMaterial = this.user.role?.permissions.some((permission: { name: string; }) => permission.name === 'view.datamaterial');
     }
+    
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.canViewDataMaster = this.hasPermission('view.datamaster');
+    this.canViewDataMaterial = this.hasPermission('view.datamaterial');
+    this.canViewUser = this.hasPermission('view.user');
+    this.canViewRole = this.hasPermission('view.role');
+    this.canViewPermission = this.hasPermission('view.permission');
+    this.canViewMaterial = this.hasPermission('view.material');
+    this.canViewPart = this.hasPermission('view.part');
+    this.canViewSupplier = this.hasPermission('view.supplier');
+    this.canViewCustomer = this.hasPermission('view.customer');
 
     this.roleId = this.auth.getRoleId();
     
   }
+
+  hasPermission(permissionName: string): boolean {
+    return this.user?.role?.permissions?.some((permission: { name: string }) => permission.name === permissionName);
+  }  
 
   hasRole(roleId: number): boolean {
     return this.roleId === roleId;
