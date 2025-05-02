@@ -7,38 +7,27 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from
 export class RoleGuard implements CanActivate {
   constructor(private router: Router) {}
 
-  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    // Ambil user dari localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    // Ambil daftar permission yang dibutuhkan dari route data
+    const required: string[] = next.data['permissions'] || [];
 
-    console.log('Current user:', user);
-    console.log('Trying to access route:', next.routeConfig?.path);
+    // Jika tidak ada requirement khusus, izinkan
+    if (required.length === 0) return true;
 
-    // List of permissions to check for various routes
-    const permissions = {
-      'user': 'view.user',
-      'role': 'view.role',
-      'permission': 'view.permission',
-      'customer': 'view.customer',
-      'supplier': 'view.supplier',
-      'part': 'view.part',
-      'material': 'view.material',
-    };
+    // Cek apakah user punya minimal satu permission
+    const hasOne = user.role?.permissions?.some((p: any) =>
+      required.includes(p.name)
+    );
 
-    // Check if the current route matches one of the routes that require permissions
-    const requiredPermission = permissions[next.routeConfig?.path as keyof typeof permissions];
+    if (hasOne) return true;
 
-    if (requiredPermission) {
-      const hasPermission = user?.role?.permissions.some(
-        (permission: { name: string }) => permission.name === requiredPermission
-      );
-
-      console.log(`Has permission for ${next.routeConfig?.path}:`, hasPermission);
-      if (!hasPermission) {
-        this.router.navigate(['/forbidden']);
-        return false;
-      }
-    }
-
-    return true; // Allow access if permission check passes
+    // Kalau gak, redirect ke forbidden
+    this.router.navigate(['/forbidden']);
+    return false;
   }
 }

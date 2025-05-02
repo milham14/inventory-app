@@ -3,6 +3,8 @@ import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../../services/role/role.service';
 import { PermissionService } from '../../../services/permission/permission.service';  // Tambahkan service permission
+import { filter } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
 declare var $: any;
 
 @Component({
@@ -14,6 +16,9 @@ declare var $: any;
 })
 export class RoleComponent implements OnInit {
   isBrowser: boolean = false;
+  canEditRole: boolean = false;
+  canDeleteRole: boolean = false;
+  canCreateRole: boolean = false;
   roleToDelete: any = null;
   dataSource: any[] = [];
 
@@ -25,20 +30,63 @@ export class RoleComponent implements OnInit {
 
   selectedRole: any = null;
   allPermissions: any[] = []; // List permission dari database
+  user: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private roleService: RoleService,
+    private router: Router,
     private permissionService: PermissionService // Inject PermissionService
   ) {}
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.isBrowser = true;
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
+    if (this.isBrowser) {
+      // setiap selesai navigasi, init ulang Select2
+      this.router.events
+        .pipe(filter(e => e instanceof NavigationEnd))
+        .subscribe(() => this.initSelect2());
     }
 
     this.loadPermissions();
     this.LoadUser();
+
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.canCreateRole = this.hasPermission('create.role');
+    this.canEditRole = this.hasPermission('edit.role');
+    this.canDeleteRole = this.hasPermission('delete.role');
+
+  }
+
+  ngAfterViewInit(): void {
+    // pada pertama kali mount juga
+    if (this.isBrowser) {
+      this.initSelect2();
+    }
+  }
+
+  hasPermission(permissionName: string): boolean {
+    return this.user?.role?.permissions?.some((permission: { name: string }) => permission.name === permissionName);
+  }
+
+  private initSelect2(): void {
+    setTimeout(() => {
+      // inisialisasi dropdown permission
+      $('#permission')
+        .off('change')
+        .select2({ width: '100%', placeholder: 'Pilih Permissions' })
+        .on('change', (e: any) => {
+          const vals = $(e.target).val() as string[];
+          this.newRole.permissions = vals.map(v => +v);
+        });
+
+      // jika sedang edit, isi nilai awal
+      if (this.selectedRole) {
+        $('#permission').val(this.newRole.permissions).trigger('change');
+      }
+    }, 0);
   }
 
   LoadUser() {
@@ -56,6 +104,8 @@ export class RoleComponent implements OnInit {
   loadPermissions() {
     this.permissionService.getPermissions().subscribe((data) => {
       this.allPermissions = data;
+      
+      this.initSelect2();
     });
   }
 
@@ -84,7 +134,10 @@ export class RoleComponent implements OnInit {
       permissions: role?.permissions?.map((p: any) => p.id) || [], // Isi list permission
     };
     $('#modalTambahRole').modal('show');
+
+    this.initSelect2();
   }
+
 
   deleteRole(role: any) {
     this.roleToDelete = role;
@@ -116,10 +169,15 @@ export class RoleComponent implements OnInit {
     setTimeout(() => $('#roleTable').DataTable(), 0);
   }
 
-  openModal() {
-    this.newRole = { name: '', permissions: [] };
+  openModal(): void {
     this.selectedRole = null;
+    this.newRole = { name: '', permissions: [] };
+  
+    // Hapus semua pilihan di Select2
+    $('#permission').val([]).trigger('change');
+  
     $('#modalTambahRole').modal('show');
+    this.initSelect2();
   }
 
   closeModal() {

@@ -1,0 +1,88 @@
+<div *ngIf="isBrowser">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a style="color: #3399ff;">Data Master</a></li>
+            <li class="breadcrumb-item active" style="color: #202020;">Material</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-6">
+          <span>List Material</span>
+        </div>
+        <div class="col-6 text-right">
+          <button class="btn btn-success" (click)="openModal()">Tambah User</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <table id="userTable" class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nomor Material</th>
+            <th>Nama Material</th>
+            <th>Quantity</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of dataSource; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ user.nomor_material }}</td>
+            <td>{{ user.nama_material }}</td>
+            <td>{{ user.qty }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(user)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Hapus</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Tambah/Edit User -->
+  <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTambahUserLabel">{{ selectedUser ? 'Edit User' : 'Tambah User' }}</h5>
+          <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="nomor_material">Nomor Material</label>
+              <input id="nomor_material" name="nomor_material" type="text" class="form-control" [(ngModel)]="newUser.nomor_material">
+            </div>
+            <div class="form-group">
+              <label for="nama_material">Nama Material</label>
+              <input id="nama_material" name="nama_material" type="text" class="form-control" [(ngModel)]="newUser.nama_material">
+            </div>
+            <div class="form-group">
+              <label for="qty">Quantity</label>
+              <input id="qty" name="qty" type="qty" class="form-control" [(ngModel)]="newUser.qty">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" (click)="simpanUser()">{{ selectedUser ? 'Update' : 'Simpan' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,13 +6,16 @@ import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   standalone: true,
-  templateUrl: './admin.component.html',
+  templateUrl: './scope.component.html',
   imports: [RouterLink, RouterOutlet, CommonModule]
 })
-export class AdminComponent implements OnInit {
+export class ScopeComponent implements OnInit {
   userMenuOpen = false;
   masterDataOpen = false;
   acceptMaterialOpen = false;
+  subcontOpen = false;
+  acceptSubmenuOpen = false;
+  acceptSub2menuOpen = false;
   canViewDataMaster: boolean = false;
   canViewDataMaterial: boolean = false;
   user: any;
@@ -104,6 +107,21 @@ export class AdminComponent implements OnInit {
     event.stopPropagation();
     this.acceptMaterialOpen = !this.acceptMaterialOpen;
   }
+  toggleAcceptSubmenu(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.acceptSubmenuOpen = !this.acceptSubmenuOpen;
+  }
+  toggleAcceptSubmenu2(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.acceptSub2menuOpen = !this.acceptSub2menuOpen;
+  }
+  toggleSubcontOpen(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.subcontOpen = !this.subcontOpen;
+  }
   
 
   /** Hanya logout waktu tombol logout diklik */
@@ -123,6 +141,15 @@ export class AdminComponent implements OnInit {
     }
     if (!target.closest('.has-treeview')) {
       this.acceptMaterialOpen = false;
+    }
+    if (!target.closest('.has-treeview')) {
+      this.acceptSubmenuOpen = false;
+    }
+    if (!target.closest('.has-treeview')) {
+      this.acceptSub2menuOpen = false;
+    }
+    if (!target.closest('.has-treeview')) {
+      this.subcontOpen = false;
     }
   }
 }

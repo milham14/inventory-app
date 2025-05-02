@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.username, this.password).subscribe({
       next: (response) => {
         // Kirim user lewat navigation state
-        this.router.navigate(['/admin/dashboard'], {
+        this.router.navigate(['/scope/dashboard'], {
           state: { user: response.admin }
         });
       },

@@ -15,6 +15,9 @@ declare var $: any;
 })
 export class UserComponent implements OnInit {
   isBrowser: boolean = false;
+  canEditUser: boolean = false;
+  canDeleteUser: boolean = false;
+  canCreateUser: boolean = false;
   userToDelete: any = null;
   dataSource: any[] = [];
   roleData: any[] = []; // Data untuk role
@@ -30,6 +33,7 @@ export class UserComponent implements OnInit {
 
   // Selected user for editing
   selectedUser: any = null;
+  user: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -44,7 +48,17 @@ export class UserComponent implements OnInit {
 
     this.loadUser();
     this.loadRoles(); // Memuat data role
+
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.canCreateUser = this.hasPermission('create.user');
+    this.canEditUser = this.hasPermission('edit.user');
+    this.canDeleteUser = this.hasPermission('delete.user');
   }
+
+  hasPermission(permissionName: string): boolean {
+    return this.user?.role?.permissions?.some((permission: { name: string }) => permission.name === permissionName);
+  } 
 
   loadUser() {
     this.userService.getUsers().subscribe((data) => {
