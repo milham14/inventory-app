@@ -17,6 +17,7 @@ import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { RoleGuard } from './components/auth/role.guard';
 import { ListSupplierComponent } from './components/material/list-supplier/list-supplier.component';
 import { SembadaInComponent } from './components/data/subcont/sembada/sembada-in.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
     {
@@ -39,6 +40,10 @@ export const routes: Routes = [
             {
                 path: 'dashboard',
                 component: DashboardComponent
+            },
+            {
+              path: 'contact',
+              component: ContactComponent
             },
             {
                 path: 'master',
@@ -137,20 +142,21 @@ export const routes: Routes = [
                 ]
             },
             {
-                path: 'contact',
-                component: ContactComponent
-            },
-            {
-                path: 'accept-material',
-                component: AcceptMaterialComponent
-            },
-            {
-                path: 'list-material',
-                component: ListMaterialComponent
-            },
-            {
-                path: 'list-supplier',
-                component: ListSupplierComponent
+              path: 'material',
+              children: [
+              {
+                  path: 'accept-material',
+                  component: AcceptMaterialComponent
+              },
+              {
+                  path: 'list-material',
+                  component: ListMaterialComponent
+              },
+              {
+                  path: 'list-supplier',
+                  component: ListSupplierComponent
+              },
+              ]
             },
             {
                 path: 'sembada-in',
@@ -160,4 +166,5 @@ export const routes: Routes = [
     
     },
     { path: 'forbidden', component: ForbiddenComponent },
+    { path: '**', component: NotFoundComponent }
 ];
