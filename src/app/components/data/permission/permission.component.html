@@ -19,7 +19,7 @@
         <div class="col-6">
           <span>List Permission</span>
         </div>
-        <div class="col-6 text-right">
+        <div class="col-6 text-right" *ngIf="canCreatePermission">
           <button class="btn btn-success" (click)="openModal()">Tambah Permission</button>
         </div>
       </div>
@@ -39,8 +39,8 @@
             <td>{{ i + 1 }}</td> <!-- Menampilkan nomor urut -->
             <td>{{ item.name }}</td> <!-- Mengakses nama role di kolom 'name' -->
             <td>
-              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(item)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteUser(item)">Hapus</button>
+              <button class="btn btn-primary btn-sm mr-1" (click)="editUser(item)" *ngIf="canEditPermission">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(item)" *ngIf="canDeletePermission">Hapus</button>
             </td>
           </tr>
         </tbody>

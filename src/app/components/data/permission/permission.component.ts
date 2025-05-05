@@ -14,6 +14,9 @@ declare var $: any;
 })
 export class PermissionComponent implements OnInit {
   isBrowser: boolean = false;
+  canEditPermission: boolean = false;
+  canDeletePermission: boolean = false;
+  canCreatePermission: boolean = false;
   permissionToDelete: any = null;
   dataSource: any[] = [];
 
@@ -24,6 +27,7 @@ export class PermissionComponent implements OnInit {
 
   // Selected user for editing
   selectedPermission: any = null;
+  user: any;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private permissionService: PermissionService) {}
 
@@ -33,7 +37,18 @@ export class PermissionComponent implements OnInit {
     }
 
     this.loadUser();
+
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.canCreatePermission = this.hasPermission('create.permission');
+    this.canEditPermission = this.hasPermission('edit.permission');
+    this.canDeletePermission = this.hasPermission('delete.permission');
+
   }
+
+  hasPermission(permissionName: string): boolean {
+    return this.user?.role?.permissions?.some((permission: { name: string }) => permission.name === permissionName);
+  } 
 
   loadUser() {
     const table = $('#permissionTable').DataTable();

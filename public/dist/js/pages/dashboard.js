@@ -7,7 +7,7 @@
 
 /* global moment:false, Chart:false, Sparkline:false */
 
-$(function () {
+/*$(function () {
   'use strict'
 
   // Make the dashboard widgets sortable Using jquery UI
@@ -48,7 +48,7 @@ $(function () {
   })
 
   /* jQueryKnob */
-  $('.knob').knob()
+  /*$('.knob').knob()
 
   // jvectormap data
   var visitorsData = {
@@ -113,7 +113,7 @@ $(function () {
 
   /* Chart.js Charts */
   // Sales chart
-  var salesChartCanvas = document.getElementById('revenue-chart-canvas').getContext('2d')
+  /*var salesChartCanvas = document.getElementById('revenue-chart-canvas').getContext('2d')
   // $('#revenue-chart').get(0).getContext('2d');
 
   var salesChartData = {
@@ -265,3 +265,4 @@ $(function () {
     options: salesGraphChartOptions
   })
 })
+**/
