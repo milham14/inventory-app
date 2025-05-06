@@ -2,3 +2,38 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.login-page {
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #000);
+    background-size: 400% 400%;
+    animation: gradientBackground 10s ease infinite;
+    height: 100vh;
+  }
+  
+  @keyframes gradientBackground {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+    
+  }
+
+  .glowing-logo {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px #2a5298;
+    }
+    to {
+      box-shadow: 0 0 20px #1e90ff, 0 0 30px #2a5298;
+    }
+  }
+  
+  

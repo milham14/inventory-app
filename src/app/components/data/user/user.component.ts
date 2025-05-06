@@ -3,6 +3,7 @@ import { AfterViewInit, Component, Inject, OnInit, PLATFORM_ID } from '@angular/
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user/user.service';
 import { RoleService } from '../../../services/role/role.service';
+import Swal from 'sweetalert2';
 
 declare var $: any;
 
@@ -15,7 +16,6 @@ declare var $: any;
 })
 export class UserComponent implements OnInit {
   isBrowser: boolean = false;
-  canEditUser: boolean = false;
   canDeleteUser: boolean = false;
   canCreateUser: boolean = false;
   userToDelete: any = null;
@@ -52,7 +52,6 @@ export class UserComponent implements OnInit {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
 
     this.canCreateUser = this.hasPermission('create.user');
-    this.canEditUser = this.hasPermission('edit.user');
     this.canDeleteUser = this.hasPermission('delete.user');
   }
 
@@ -74,46 +73,98 @@ export class UserComponent implements OnInit {
     });
   }
 
+  canEdit(user: any): boolean {
+    const currentUser = this.user;
+    const currentRoleId = currentUser?.role_id;
+    const currentUserId = currentUser?.id;
+  
+    // Cek apakah dia punya permission "edit.user"
+    if (!this.hasPermission('edit.user')) return false;
+  
+    // Admin Super bisa edit siapa saja
+    if (currentRoleId === 3) return true;
+  
+    // Admin bisa edit siapa saja
+    if (currentRoleId === 1) return true;
+  
+    // User bisa edit dirinya sendiri
+    if (user.id === currentUserId) return true;
+  
+    return false;
+  }
+
+  canEditRole(): boolean {
+    // Mengambil role dari user yang sedang login
+    const currentUser = this.user;
+    const currentRoleId = currentUser?.role_id;
+  
+    // Admin Super (role_id === 3) dan Admin (role_id === 1) bisa mengedit role
+    if (currentRoleId === 1 || currentRoleId === 3) {
+      return true; // Jika Admin atau Admin Super, role bisa diedit
+    }
+  
+    return false; // Jika bukan Admin atau Admin Super, role tidak bisa diedit
+  }
+  
+  
+  
+
   // Function to save or update a user
   simpanUser() {
     if (this.selectedUser) {
-      // Jika hanya role_id yang berubah
-      if (this.selectedUser.role_id !== this.newUser.role_id) {
-        // Update role_id saja
-        this.updateRole();
-      } else {
-        // Update user secara keseluruhan
-        this.updateUser();
-      }
-    } else {
-      // Create new user
-      this.userService.createUser(this.newUser).subscribe((response) => {
-        this.dataSource.push(response);  // Add new user to dataSource
-
-        // Refresh DataTable
-        this.loadUser();
-
-        // Close modal and reset form
+      // Edit user
+      this.userService.updateUser(this.selectedUser.id, this.newUser).subscribe((response) => {
+        const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
+        if (index > -1) {
+          this.dataSource[index] = response;
+        }
+  
         this.closeModal();
+        this.loadUser();
+  
+        // SweetAlert sukses edit
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: 'Data user berhasil diperbarui.',
+          confirmButtonColor: '#3085d6'
+        });
+      });
+    } else {
+      // Tambah user baru
+      this.userService.createUser(this.newUser).subscribe((response) => {
+        this.dataSource.push(response);
+        this.loadUser();
+        this.closeModal();
+  
+        // SweetAlert sukses tambah
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: 'User baru berhasil ditambahkan.',
+          confirmButtonColor: '#3085d6'
+        });
       });
     }
   }
+  
+  
 
   // Fungsi untuk memperbarui hanya role_id
-  updateRole() {
-    this.userService.updateRole(this.selectedUser.id, { role_id: this.newUser.role_id }).subscribe((response) => {
-      const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
-      if (index > -1) {
-        this.dataSource[index].role_id = response.role_id;  // Update role_id di dataSource
-      }
+//  updateRole() {
+//    this.userService.updateRole(this.selectedUser.id, { role_id: this.newUser.role_id }).subscribe((response) => {
+ //     const index = this.dataSource.findIndex(user => user.id === this.selectedUser.id);
+//      if (index > -1) {
+//        this.dataSource[index].role_id = response.role_id;  // Update role_id di dataSource
+ //     }
 
       // Refresh DataTable
-      this.loadUser();
+ //     this.loadUser();
 
       // Close modal and reset form
-      this.closeModal();
-    });
-  }
+//      this.closeModal();
+//    });
+//  }
 
   // Fungsi untuk memperbarui user secara keseluruhan
   updateUser() {
@@ -141,7 +192,7 @@ export class UserComponent implements OnInit {
       name: user?.name, 
       username: user.username, 
       email: user.email, 
-      password: '',  // Password won't be pre-filled for security reasons
+      password: '',
       role_id: user.role_id  // Menambahkan role_id untuk editing
     };
 

@@ -18,6 +18,7 @@ export class ScopeComponent implements OnInit {
   acceptSub2menuOpen = false;
   canViewDataMaster: boolean = false;
   canViewDataMaterial: boolean = false;
+  canViewDataSubcont: boolean = false;
   user: any;
   roleId: number = 0;
   loading = true;
@@ -66,6 +67,7 @@ export class ScopeComponent implements OnInit {
 
     this.canViewDataMaster = this.hasPermission('view.datamaster');
     this.canViewDataMaterial = this.hasPermission('view.datamaterial');
+    this.canViewDataSubcont = this.hasPermission('view.subcont');
     this.canViewUser = this.hasPermission('view.user');
     this.canViewRole = this.hasPermission('view.role');
     this.canViewPermission = this.hasPermission('view.permission');
