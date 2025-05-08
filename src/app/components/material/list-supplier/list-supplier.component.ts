@@ -27,33 +27,103 @@ export class ListSupplierComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
-    if (this.isBrowser) {
+   // if (this.isBrowser) {
       // setiap selesai navigasi, init ulang Select2
-      this.router.events
-        .pipe(filter(e => e instanceof NavigationEnd))
-        .subscribe(() => this.initSelect2());
-    }
+     // this.router.events
+        //.pipe(filter(e => e instanceof NavigationEnd))
+       // .subscribe(() => this.initSelect2());
+   // }
 
     this.LoadPermissions();
   }
 
   ngAfterViewInit(): void {
-    // pada pertama kali mount juga
-    if (this.isBrowser) {
-      this.initSelect2();
-      this.initForm();
+    // Kalau server-side (Angular Universal), skip
+    if (!this.isBrowser) {
+      return;
     }
+  
+    // Init sekali waktu load pertama
+    this.initSelect2();
+    this.initForm();
+  
+    // Re-init Select2 (dan Form plugins) setiap kartu di-expand
+    $(document)
+      .off('expanded.lte.cardwidget')
+      .on('expanded.lte.cardwidget', () => {
+        this.reinitSelect2();
+        this.reinitForm();      // <— tambahkan ini kalau datepicker/daterange/duallistbox perlu re-init
+      });
   }
+  
+  
+  
 
   private initSelect2() {
-    // delay kecil supaya elemen sudah ada
     setTimeout(() => {
-      $('.select2').select2();
-      $('.select2bs4').select2({ theme: 'bootstrap4' });
-    },
-    
-    0);
+      // Default theme
+      $('.select2').each((_: any, el: any) => {
+        const $el = $(el);
+        if (!$el.data('select2')) {
+          $el.select2();
+        }
+      });
+      // Bootstrap4 theme
+      $('.select2bs4').each((_: any, el: any) => {
+        const $el = $(el);
+        if (!$el.data('select2')) {
+          $el.select2({ theme: 'bootstrap4' });
+        }
+      });
+    }, 0);
   }
+  
+  private reinitSelect2() {
+    setTimeout(() => {
+      // Default theme
+      $('.select2').each((_: any, el: any) => {
+        const $el = $(el);
+        if ($el.data('select2')) {
+          $el.select2('destroy');
+        }
+        $el.select2();
+      });
+      // Bootstrap4 theme
+      $('.select2bs4').each((_: any, el: any) => {
+        const $el = $(el);
+        if ($el.data('select2')) {
+          $el.select2('destroy');
+        }
+        $el.select2({ theme: 'bootstrap4' });
+      });
+    }, 0);
+  }
+
+  private reinitForm(): void {
+    setTimeout(() => {
+      // Hanya contoh, ulangi guard & destroy+init seperti di initForm
+      const $date = $('#reservationdate');
+      if ($date.length) {
+        // destroy dulu kalau ada API destroy-nya, misal
+        $date.datetimepicker('destroy');
+        $date.datetimepicker({ format: 'L' });
+      }
+  
+      const $range = $('#reservationtime');
+      if ($range.length) {
+        $range.data('daterangepicker')?.remove();   // hapus instance lama
+        $range.daterangepicker({
+          timePicker: true,
+          timePickerIncrement: 30,
+          locale: { format: 'MM/DD/YYYY hh:mm A' }
+        });
+      }
+  
+      // ulangi untuk duallistbox, colorpicker, switch, dsb.
+    }, 0);
+  }
+  
+  
 
   initForm(): void {
     setTimeout(() => {
@@ -129,8 +199,6 @@ $(this).bootstrapSwitch('state', $(this).prop('checked'));
   LoadPermissions() {
     this.permissionService.getPermissions().subscribe((data) => {
       this.allPermissions = data;
-      
-      this.initSelect2();
     })
   }
 

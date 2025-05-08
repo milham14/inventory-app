@@ -18,6 +18,8 @@
   import { ListSupplierComponent } from './components/material/list-supplier/list-supplier.component';
   import { SembadaInComponent } from './components/data/subcont/sembada/sembada-in/sembada-in.component';
   import { NotFoundComponent } from './not-found/not-found.component';
+  import { SembadaOutComponent } from './components/data/subcont/sembada/sembada-out/sembada-out.component';
+import { BkuInComponent } from './components/data/subcont/bku/bku-in/bku-in.component';
 
   export const routes: Routes = [
       {
@@ -161,6 +163,14 @@
               {
                   path: 'sembada-in',
                   component: SembadaInComponent
+              },
+              {
+                path: 'sembada-out',
+                component: SembadaOutComponent
+              },
+              {
+                path: 'bku-in',
+                component: BkuInComponent
               }
           ]
       
