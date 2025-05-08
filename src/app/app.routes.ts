@@ -19,7 +19,8 @@
   import { SembadaInComponent } from './components/data/subcont/sembada/sembada-in/sembada-in.component';
   import { NotFoundComponent } from './not-found/not-found.component';
   import { SembadaOutComponent } from './components/data/subcont/sembada/sembada-out/sembada-out.component';
-import { BkuInComponent } from './components/data/subcont/bku/bku-in/bku-in.component';
+  import { BkuInComponent } from './components/data/subcont/bku/bku-in/bku-in.component';
+import { BkuOutComponent } from './components/data/subcont/bku/bku-out/bku-out.component';
 
   export const routes: Routes = [
       {
@@ -171,6 +172,10 @@ import { BkuInComponent } from './components/data/subcont/bku/bku-in/bku-in.comp
               {
                 path: 'bku-in',
                 component: BkuInComponent
+              },
+              {
+                path: 'bku-out',
+                component: BkuOutComponent
               }
           ]
       
